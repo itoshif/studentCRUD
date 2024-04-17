@@ -1,0 +1,20 @@
+﻿@model IEnumerable<Getmarkmodel>
+<h2 class="display-4"> Marks</h2>
+<a style="float: right;" href="@Url.Action("UpdateMarks","Home")">Update Marks</a>
+<table class="table">
+    <thead >
+        <td>Subject</td>
+        <td>Marks</td>
+    </thead>
+    <tbody>
+       
+            @foreach( var item in Model)
+            {
+                <tr>
+                    <td>@item.Subject</td>
+                    <td>@item.Marks</td>
+                </tr>
+                
+            }
+    </tbody>
+</table>

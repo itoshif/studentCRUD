@@ -1,0 +1,123 @@
+﻿@model WebApplication1.Models.ViewModels
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>demoCRUD</title>
+    <style>
+        button {
+            margin-right: 10px;
+        }
+
+        .popup {
+            width: 400px;
+            background: white;
+            border-radius: 6px;
+            border: 2px solid #ccc;
+            position: fixed; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%) scale(0.1); 
+            text-align: center;
+            padding: 30px 30px;
+            visibility: hidden;
+        }
+        .open-popup {
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+            transition: transform 0.3s;
+        }
+        .search {
+            display: flex;
+            align-items: center;
+            width: auto;
+            margin-bottom: 20px; 
+        }
+        .search input[type=text] {
+                width: 90%; 
+                padding: 8px; 
+        }    
+        .search button {
+            width: 10%;
+            box-sizing: border-box;
+            padding: 10px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            }
+    </style>
+    </head>
+    <body>
+    <div class="text-center">
+        <h1 class="display-4">Students</h1>
+    </div>
+    <div class="search">
+        <input type="text" id="searchInput" placeholder="Enter Name.." value=""/>
+        <button onclick="Searchall()">search
+        </button>
+    </div>
+    
+    <table class="table">
+    <thead>
+                <th>Id</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>DOB</th>
+                <th>Fathers name</th>
+                <th>Mothers name</th>
+                <th>Address</th>
+    </thead>
+    <tbody>
+    @foreach (var item in Model.student) {
+                    <tr>
+                        <td> @item.Id</td>
+                        <td>@item.FirstName </td>
+                        <td>@item.LastName</td>
+                        <td>@item.DOB</td>
+                        <td>@item.FatherName</td>
+                        <td>@item.MotherName</td>
+                        <td>@item.Address</td>
+                        <td>
+                        <a onclick="openpop('marks', @item.Id)">Marks</a> |
+                        <a onclick="openpop('fees',@item.Id)">Fees</a>
+                        </td>
+                    </tr>
+    }   </tbody>
+    </table>
+    <div class="popup" id="popupf">
+        <p>Fee is _____</p>
+        <button onclick="closepop()">OK</button>
+    </div>
+    <script>
+        function Searchall() {
+            var searchterm = document.getElementById('searchInput').value.trim();
+            window.location.href = "/Home/Index?searchterm=" + encodeURIComponent(searchterm);
+        }
+        let popup = document.getElementById('popupf');
+        function openpop(type, id) {
+            if (type === 'fees') {
+                fetch(`/Home/GetFee?id=${id}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        popup.querySelector('p').textContent = data ? 'Fee is Paid' : 'Fee is Pending';
+                        popup.classList.add("open-popup");
+                    })
+                    .catch(error => console.error('Error:', error));
+            } else if (type === 'marks') {
+                fetch(`/Home/GetMarksPartial?id=${id}`)
+                    .then(response => response.text())
+                    .then(html => {
+                        popup.innerHTML = html;
+                        popup.classList.add("open-popup");
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        }
+        function closepop() {
+            popup.classList.remove("open-popup");
+        }
+    </script>
+    </body>
+</html>

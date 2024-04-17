@@ -1,0 +1,106 @@
+﻿@model IEnumerable<students>
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+        #label-1,#label-2{
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            text-align: left;
+        }
+
+            input[type="number"],select{
+            width: 300px;
+            padding: 5px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            }
+
+        input[type="radio"]{
+            padding: 5px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        #submit{
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #submit:hover {
+            background-color: #45a049;
+        }
+        </style>
+    </head>
+    <body>
+    @{
+        ViewData["Title"] = "Fee Status";
+    }
+    <h1 class="display-4">@ViewData["Title"]</h1>
+    <br />
+    <form id="feeUpdateForm" method="post">
+        <label for=" iddropdown" id="label-1"> Select Studetn Id: </label>
+        <select id="iddropdown">
+            @foreach (var item in Model)
+            {
+                <option value="@item.Id">@item.FirstName</option>
+            }
+        </select>
+        <br />
+        <label id="label-2" for="paymentStatus">Payment Status:</label>
+        <input type="radio" id="paid" name="paymentStatus" value="paid" required>
+        <label for="paid">Paid</label>
+        <input type="radio" id="unpaid" name="paymentStatus" value="unpaid">
+        <label for="unpaid">Unpaid</label>
+        <br />
+        <br />
+        <input id="submit" type="button" value="Submit" />
+    </form>
+    <br />
+    </body>
+    <script>
+        const submitButton = document.getElementById('submit');
+        submitButton.addEventListener('click', updatefee);
+        
+        const msg = document.getElementById('msg');
+
+
+        function updatefee() {
+            const studentId = document.getElementById('iddropdown').value;
+            const paystatus = document.querySelector('input[name="paymentStatus"]:checked').value;
+            console.log(paystatus)
+            let fee;
+            if (paystatus === 'paid') { fee = true; }
+            else { fee = false; }
+
+            const student = {
+            studentId: studentId,
+                    feeStatus: fee
+            };
+            console.log(student)
+            fetch('/Home/AddFees', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(student)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to update');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('updated successfully', data);
+                msg.style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error updating fee', error);
+            });
+        }
+    </script>
+</html>
